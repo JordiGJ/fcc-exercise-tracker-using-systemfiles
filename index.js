@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 require('dotenv').config();
+const fs = require('fs');
 
 app.use(cors());
 app.use(express.json());
@@ -26,6 +27,33 @@ const fakeID = () => {
 // we store users here
 let users = [];
 
+// update users.json
+function updateUsersFile() {
+  fs.writeFile('users.json', JSON.stringify(users), { flag: 'w' }, err => {
+    if (err) throw err;
+  });
+}
+
+async function updateUsersVar() {
+  fs.readFile('users.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading the file:', err);
+    } else {
+      try {
+        if (!data) {
+          console.log('no data in users.json');
+        } else {
+          const jsonData = JSON.parse(data);
+          users = [];
+          users = jsonData;
+        }
+      } catch (jsonError) {
+        console.error('Error parsing JSON:', jsonError);
+      }
+    }
+  });
+}
+updateUsersVar();
 // create new user
 app.post('/api/users', (req, res) => {
   const username = req.body.username;
@@ -40,7 +68,9 @@ app.post('/api/users', (req, res) => {
   if (!isUser) {
     res.json({ username, _id });
     users.push(newUser);
-    console.log('new user', users);
+    // console.log('new user', users);
+    updateUsersFile();
+    updateUsersVar();
   } else {
     console.log('existing user');
   }
@@ -57,6 +87,7 @@ app.post('/api/users/:_id/exercises', (req, res) => {
     date = new Date(date).toDateString();
   }
   const user = users.find(u => u._id === _id);
+  // console.log(_id, users, user);
   const obj = {
     _id,
     description,
@@ -72,7 +103,15 @@ app.post('/api/users/:_id/exercises', (req, res) => {
   };
   user.log.push(newExercise);
   user.count++;
-  users = [...users, user];
+  // users = [...users, user];
+  const allButUser = users.filter(u => u._id !== _id);
+  users = [...allButUser, user];
+  // console.log(user, 'user');
+  // console.log(allButUser, 'allButUser');
+  // console.log(users);
+  updateUsersFile();
+  updateUsersVar();
+  users.forEach(user => console.log(user.username));
 });
 
 // see user info
