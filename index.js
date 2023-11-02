@@ -68,7 +68,6 @@ app.post('/api/users', (req, res) => {
   if (!isUser) {
     res.json({ username, _id });
     users.push(newUser);
-    // console.log('new user', users);
     updateUsersFile();
     updateUsersVar();
   } else {
@@ -87,7 +86,6 @@ app.post('/api/users/:_id/exercises', (req, res) => {
     date = new Date(date).toDateString();
   }
   const user = users.find(u => u._id === _id);
-  // console.log(_id, users, user);
   const obj = {
     _id,
     description,
@@ -103,20 +101,36 @@ app.post('/api/users/:_id/exercises', (req, res) => {
   };
   user.log.push(newExercise);
   user.count++;
-  // users = [...users, user];
   const allButUser = users.filter(u => u._id !== _id);
   users = [...allButUser, user];
-  // console.log(user, 'user');
-  // console.log(allButUser, 'allButUser');
-  // console.log(users);
   updateUsersFile();
   updateUsersVar();
-  users.forEach(user => console.log(user.username));
 });
 
 // see user info
-app.get('/api/users/:_id/logs', (req, res) => {
+app.get('/api/users/:_id/logs?', (req, res) => {
+  const reqQuery = req._parsedOriginalUrl.query;
+  const logs = req.params.log || '';
   const _id = req.params._id;
+  if (reqQuery) {
+    if (reqQuery.includes('&')) {
+      const sRQ = reqQuery.split('&');
+      const from = new Date(sRQ[0].slice(5));
+      const to = new Date(sRQ[1].slice(3));
+      const user = users.find(u => u._id === _id);
+      const timeRange = user.log.filter(
+        e => new Date(e.date) >= from && new Date(e.date) <= to
+      );
+      res.json({ ...user, log: timeRange });
+      return;
+    } else {
+      const limit = +reqQuery.slice(6);
+      const user = users.find(u => u._id === _id);
+      const limitedLog = user.log.filter((e, i) => i <= limit - 1);
+      res.json({ ...user, log: limitedLog });
+      return;
+    }
+  }
   const user = users.find(u => u._id === _id);
   res.json(user);
 });

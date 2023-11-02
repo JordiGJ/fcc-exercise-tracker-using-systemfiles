@@ -1,1 +1,18 @@
-[{"username":"jor2","count":2,"_id":"89986826779211736162831","log":[{"description":"b","duration":2,"date":"Wed Nov 01 2023"},{"description":"bb","duration":22,"date":"Wed Nov 01 2023"}]},{"username":"jor1","count":1,"_id":"59067138224737697442347","log":[{"description":"a","duration":1,"date":"Wed Nov 01 2023"}]}]
+[
+  {
+    "username": "jor2",
+    "count": 2,
+    "_id": "89986826779211736162831",
+    "log": [
+      { "description": "b", "duration": 2, "date": "Wed Nov 01 2021" },
+      { "description": "bb", "duration": 22, "date": "Wed Nov 01 2023" },
+      { "description": "bbb", "duration": 222, "date": "Wed Nov 01 2022" }
+    ]
+  },
+  {
+    "username": "jor1",
+    "count": 1,
+    "_id": "59067138224737697442347",
+    "log": [{ "description": "a", "duration": 1, "date": "Wed Nov 01 2023" }]
+  }
+]
